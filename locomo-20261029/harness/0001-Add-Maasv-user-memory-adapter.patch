@@ -1,0 +1,397 @@
+From ad2aa1d5692e4ee4b9d782ef0b00a1a9974264ab Mon Sep 17 00:00:00 2001
+From: Adam Bell <24683522+ascottbell@users.noreply.github.com>
+Date: Thu, 29 Oct 2026 18:06:05 -0400
+Subject: [PATCH 1/2] Add Maasv user-memory adapter
+
+HTTP client for a self-hosted Maasv service (add, search, delete_user),
+registered for LoCoMo as a shared-store backend; env template, docs and
+offline tests.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ docs/user_memory/README.md              |   3 +-
+ docs/user_memory/README_zh.md           |   3 +-
+ docs/user_memory/maasv.md               |  47 +++++++++++
+ env_examples/.env.maasv                 |  22 +++++
+ env_examples/README.md                  |   1 +
+ scripts/client_factory/maasv_client.py  |  47 +++++++++++
+ scripts/client_factory/registry.py      |   1 +
+ scripts/locomo/locomo_ingestion.py      |   5 ++
+ scripts/locomo/locomo_search.py         |   1 +
+ scripts/tests/unit/test_maasv_client.py | 106 ++++++++++++++++++++++++
+ scripts/utils/ingest_helpers.py         |   2 +-
+ scripts/utils/search_helpers.py         |   1 +
+ 12 files changed, 236 insertions(+), 3 deletions(-)
+ create mode 100644 docs/user_memory/maasv.md
+ create mode 100644 env_examples/.env.maasv
+ create mode 100644 scripts/client_factory/maasv_client.py
+ create mode 100644 scripts/tests/unit/test_maasv_client.py
+
+diff --git a/docs/user_memory/README.md b/docs/user_memory/README.md
+index d099ac2..9b25df5 100644
+--- a/docs/user_memory/README.md
++++ b/docs/user_memory/README.md
+@@ -8,7 +8,7 @@ This track evaluates memory backend APIs through a shared benchmark pipeline
+ and adapter layer. Select a backend with `--lib` to evaluate memory products,
+ self-hosted frameworks, or custom adapters under the same benchmark flow.
+ 
+-There are 16 adapter entries covering 15 memory solutions (Zep and Graphiti
++There are 17 adapter entries covering 16 memory solutions (Zep and Graphiti
+ have separate entries). Supported benchmarks are LoCoMo, LongMemEval, BEAM,
+ PersonaMem v2, and HaluMem.
+ 
+@@ -271,6 +271,7 @@ Supported backend keys are:
+ | `backboard` | Backboard.io |
+ | `mem9` | mem9 |
+ | `lcmx` | [LCM-X setup and run configuration](./lcmx.md) |
++| `maasv` | [Maasv setup and run configuration](./maasv.md) |
+ 
+ Follow the [adapter checklist](../../CONTRIBUTING.md#adding-a-user-memory-adapter)
+ for integration, configuration, isolation, and testing, and the
+diff --git a/docs/user_memory/README_zh.md b/docs/user_memory/README_zh.md
+index b6b7b5c..9192b4c 100644
+--- a/docs/user_memory/README_zh.md
++++ b/docs/user_memory/README_zh.md
+@@ -9,7 +9,7 @@
+ API。通过 `--lib` 选择后端，可以在同一套 benchmark 流程下评估记忆产品、
+ 自托管框架和自定义适配器。
+ 
+-目前有 16 个适配器入口，覆盖 15 种记忆方案（Zep 和 Graphiti 使用不同入口），
++目前有 17 个适配器入口，覆盖 16 种记忆方案（Zep 和 Graphiti 使用不同入口），
+ 支持 LoCoMo、LongMemEval、BEAM、PersonaMem v2 和 HaluMem 五个 benchmark。
+ 
+ 首次运行建议按本文顺序阅读。已有环境可以直接查看
+@@ -255,6 +255,7 @@ LongMemEval、BEAM、PersonaMem v2 和 HaluMem 支持 `--streaming 1`，
+ | `backboard` | Backboard.io |
+ | `mem9` | mem9 |
+ | `lcmx` | [LCM-X 安装与运行配置](./lcmx.md) |
++| `maasv` | [Maasv 安装与运行配置](./maasv.md) |
+ 
+ 接入、配置、隔离与测试要求见
+ [适配器清单（英文）](../../CONTRIBUTING.md#adding-a-user-memory-adapter)，
+diff --git a/docs/user_memory/maasv.md b/docs/user_memory/maasv.md
+new file mode 100644
+index 0000000..8484ddf
+--- /dev/null
++++ b/docs/user_memory/maasv.md
+@@ -0,0 +1,47 @@
++# Maasv
++
++The `maasv` adapter evaluates Maasv through a self-hosted Maasv service over
++HTTP. Maasv is not open source.
++
++## Deployment and configuration
++
++| Setting | Value |
++| --- | --- |
++| Backend | Maasv v0.4.46, local/self-hosted |
++| Search | `top_k` from the runner (default 20); each result rendered as `[YYYY-MM-DD HH:MM] <memory text>` |
++| LoCoMo store layout | One store per conversation: all turns once, under the speaker A user ID, searched once per question (`shared_conv_search`, as for EverOS, Cognee, Letta, Hindsight and Backboard.io) |
++| Memory service model | none (the Maasv service made no LLM calls in this run) |
++
++## Running
++
++Start the Maasv service, then run the benchmark:
++
++```bash
++cp env_examples/.env.maasv .env.maasv   # fill ANSWER_* and EVAL_* credentials
++./scripts/run_locomo_eval.sh --lib maasv --env .env.maasv --version <name>
++```
++
++`MAASV_BASE_URL` (default `http://127.0.0.1:8765`) points the adapter at the
++service. The offline adapter tests are `scripts/tests/unit/test_maasv_client.py`.
++
++## Result provenance
++
++LoCoMo, 2026-10-29, run by the Maasv team:
++
++| Item | Value |
++| --- | --- |
++| Harness | OmniMemEval `7c79d46` plus the `maasv` adapter commit (no pipeline, prompt or metric changes) |
++| Dataset | `locomo10.json`, SHA-256 `79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4`; original answer key; categories 1–4 |
++| Coverage | 1,540 of 1,540 questions searched, answered and judged; 0 failed, 0 skipped, 0 timed out; denominator 1,540 |
++| Answer model | `gpt-4.1-mini-2025-04-14`, direct OpenAI API |
++| Judge model | `gpt-4o-mini-2024-07-18`, direct OpenAI API; one judge run (`--num-runs 1`) |
++| Prompts | Harness defaults at `7c79d46` |
++| Context tokens | 2,251,148 answer prompt tokens over 1,540 calls (1,461.8 per question); 45,718 completion tokens |
++| Checkpoints | Steps 1–2 and steps 3–6 ran as two invocations on the same run version; no stage was re-run and no records were re-evaluated |
++| Commands | `run_locomo_eval.sh --lib maasv --env .env.maasv --version maasv_v0446_r1 --to-step 2`, then the same with `--from-step 3` |
++
++Per-question search, answer and judge records, the run configuration and the
++generated report are published at: https://github.com/maasv-ai/omnimemeval-results/releases/tag/locomo-20261029.
++
++The records support recomputing the aggregate and replaying the answer and
++judge stages.
+diff --git a/env_examples/.env.maasv b/env_examples/.env.maasv
+new file mode 100644
+index 0000000..acdb48b
+--- /dev/null
++++ b/env_examples/.env.maasv
+@@ -0,0 +1,22 @@
++# ============================================================
++# OmniMemEval — Maasv (local self-hosted service)
++# Usage: ./scripts/run_locomo_eval.sh --lib maasv --env .env.maasv
++# Start the Maasv service first.
++# ============================================================
++
++# ─── Maasv service ───────────────────────────────────────────
++MAASV_BASE_URL="http://127.0.0.1:8765"
++# MAASV_QPS=
++
++LLM_WORKERS=10
++TOPK=20
++
++# ─── ANSWER (Answer Generation) ─────────────────────────────
++ANSWER_MODEL="gpt-4.1-mini-2025-04-14"
++ANSWER_BASE_URL="https://api.openai.com/v1"
++ANSWER_API_KEY="<YOUR_ANSWER_API_KEY>"
++
++# ─── EVAL (LLM-as-Judge Scoring) ────────────────────────────
++EVAL_MODEL="gpt-4o-mini-2024-07-18"
++EVAL_BASE_URL="https://api.openai.com/v1"
++EVAL_API_KEY="<YOUR_EVAL_API_KEY>"
+diff --git a/env_examples/README.md b/env_examples/README.md
+index 4a29f0f..db70bf1 100644
+--- a/env_examples/README.md
++++ b/env_examples/README.md
+@@ -58,6 +58,7 @@ and LLM settings.
+ | `.env.backboard` | Backboard.io |
+ | `.env.mem9` | mem9 |
+ | `.env.lcmx` | [LCM-X setup and run configuration](../docs/user_memory/lcmx.md) |
++| `.env.maasv` | [Maasv setup and run configuration](../docs/user_memory/maasv.md) |
+ | `.env.agent` | Agent Memory Evaluation / AgentBench |
+ 
+ Templates include only placeholders and public defaults. Do not commit real
+diff --git a/scripts/client_factory/maasv_client.py b/scripts/client_factory/maasv_client.py
+new file mode 100644
+index 0000000..ae7d0dd
+--- /dev/null
++++ b/scripts/client_factory/maasv_client.py
+@@ -0,0 +1,47 @@
++from .base_client import BaseApiClient, env_float, env_str
++
++
++class MaasvClient(BaseApiClient):
++    """Maasv memory service (self-hosted), over HTTP.
++
++    ``add`` sends each message with its ``chat_time``; ``search`` returns one
++    line per retrieved memory, prefixed with its time; ``delete_user`` removes
++    one evaluation user's memories. Users are isolated by ``user_id``.
++
++    LoCoMo uses one store per conversation (all turns, under the speaker A
++    user id) and one search per question, like the other shared-store
++    backends.
++
++    Key env vars:
++        MAASV_BASE_URL   Service root (default: http://127.0.0.1:8765)
++        MAASV_QPS        Client-side rate limit (default: none)
++    """
++
++    def __init__(self):
++        super().__init__(
++            base_url=env_str("MAASV_BASE_URL", "http://127.0.0.1:8765"),
++            headers={"Content-Type": "application/json"},
++            qps=env_float("MAASV_QPS", None, min_value=0),
++        )
++
++    def _call(self, path, payload):
++        def _do():
++            resp = self._post(path, json=payload)
++            resp.raise_for_status()
++            return resp.json()
++
++        return self._retry(_do)
++
++    def add(self, messages, user_id, **kwargs):
++        msgs = [
++            {"content": m["content"], **({"chat_time": m["chat_time"]} if m.get("chat_time") else {})}
++            for m in messages
++        ]
++        return self._call("/add", {"user_id": str(user_id), "messages": msgs})
++
++    def search(self, query, user_id, top_k):
++        data = self._call("/search", {"user_id": str(user_id), "query": query, "top_k": int(top_k)})
++        return data["memories"]
++
++    def delete_user(self, user_id):
++        return self._call("/delete_user", {"user_id": str(user_id)})
+diff --git a/scripts/client_factory/registry.py b/scripts/client_factory/registry.py
+index fcb973c..1453623 100644
+--- a/scripts/client_factory/registry.py
++++ b/scripts/client_factory/registry.py
+@@ -35,6 +35,7 @@ _LIB_CLIENT_REGISTRY = {
+     "backboard":   ("backboard_client",   "BackboardClient"),
+     "mem9":        ("mem9_client",        "Mem9Client"),
+     "lcmx":        ("lcmx_client",        "LcmxClient"),
++    "maasv":       ("maasv_client",       "MaasvClient"),
+ }
+ 
+ SUPPORTED_LIBS = list(_LIB_CLIENT_REGISTRY.keys())
+diff --git a/scripts/locomo/locomo_ingestion.py b/scripts/locomo/locomo_ingestion.py
+index 9d17d10..3eb5189 100644
+--- a/scripts/locomo/locomo_ingestion.py
++++ b/scripts/locomo/locomo_ingestion.py
+@@ -179,6 +179,11 @@ def ingest_session(client, session, frame, metadata):
+         client.add(letta_msgs, speaker_a_user_id,
+                     session_key=session_key, **time_kw)
+ 
++    # ── Maasv: one store per conversation, all turns once ────────────────
++    elif frame == "maasv":
++        inject_time(speaker_a_messages, dt, frame)
++        client.add(speaker_a_messages, speaker_a_user_id)
++
+     # ── Cognee: single-dataset per conversation ──────────────────────────
+     elif frame == "cognee":
+         inject_time(speaker_a_messages, dt, frame)
+diff --git a/scripts/locomo/locomo_search.py b/scripts/locomo/locomo_search.py
+index 7b3b04e..f427872 100644
+--- a/scripts/locomo/locomo_search.py
++++ b/scripts/locomo/locomo_search.py
+@@ -268,6 +268,7 @@ def search_query(client, query, metadata, frame, top_k=20):
+         "backboard": backboard_search,
+         "mem9": generic_text_search,
+         "lcmx": generic_text_search,
++        "maasv": shared_conv_search,
+     }
+     search_fn = _search_dispatch.get(frame)
+     if search_fn is None:
+diff --git a/scripts/tests/unit/test_maasv_client.py b/scripts/tests/unit/test_maasv_client.py
+new file mode 100644
+index 0000000..cfa123a
+--- /dev/null
++++ b/scripts/tests/unit/test_maasv_client.py
+@@ -0,0 +1,106 @@
++"""Unit tests for the Maasv client: configuration, registration and request shapes."""
++
++import os
++import sys
++import unittest
++from unittest import mock
++
++sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
++
++from client_factory.maasv_client import MaasvClient
++from client_factory.registry import SUPPORTED_LIBS, create_client
++from utils.ingest_helpers import inject_time
++from utils.search_helpers import DEFAULT_SEARCH_DISPATCH
++from locomo.locomo_search import shared_conv_search
++
++
++class _Resp:
++    def __init__(self, body, status=200):
++        self._body = body
++        self.status_code = status
++
++    def json(self):
++        return self._body
++
++    def raise_for_status(self):
++        if self.status_code >= 400:
++            raise RuntimeError(f"HTTP {self.status_code}")
++
++
++class TestMaasvClient(unittest.TestCase):
++    def setUp(self):
++        self._old_env = os.environ.copy()
++        for key in list(os.environ):
++            if key.startswith("MAASV_"):
++                os.environ.pop(key)
++
++    def tearDown(self):
++        os.environ.clear()
++        os.environ.update(self._old_env)
++
++    def test_registered(self):
++        self.assertIn("maasv", SUPPORTED_LIBS)
++        self.assertIsInstance(create_client("maasv"), MaasvClient)
++        self.assertIn("maasv", DEFAULT_SEARCH_DISPATCH)
++
++    def test_default_and_override_base_url(self):
++        self.assertEqual(MaasvClient().base_url, "http://127.0.0.1:8765")
++        os.environ["MAASV_BASE_URL"] = "http://maasv.internal:9000"
++        self.assertEqual(MaasvClient().base_url, "http://maasv.internal:9000")
++
++    def test_inject_time_sets_chat_time(self):
++        from datetime import datetime, timezone
++
++        msgs = [{"role": "user", "content": "Caroline: hi"}]
++        self.assertEqual(inject_time(msgs, datetime(2023, 5, 8, 13, 56, tzinfo=timezone.utc), "maasv"), {})
++        self.assertTrue(msgs[0]["chat_time"].startswith("2023-05-08T13:56"))
++
++    def test_add_sends_content_and_chat_time_per_user(self):
++        client = MaasvClient()
++        with mock.patch.object(client, "_post", return_value=_Resp({"stored": 2, "deduped": 0})) as post:
++            client.add([{"role": "user", "name": "A", "content": "A: x", "chat_time": "2023-05-08T13:56:00+00:00"},
++                        {"role": "assistant", "content": "B: y"}], "u1")
++        path, kwargs = post.call_args.args[0], post.call_args.kwargs
++        self.assertEqual(path, "/add")
++        self.assertEqual(kwargs["json"], {"user_id": "u1", "messages": [
++            {"content": "A: x", "chat_time": "2023-05-08T13:56:00+00:00"}, {"content": "B: y"}]})
++
++    def test_search_returns_memory_lines(self):
++        client = MaasvClient()
++        lines = ["[2023-05-08 13:56] A: x"]
++        with mock.patch.object(client, "_post", return_value=_Resp({"memories": lines})) as post:
++            self.assertEqual(client.search("q", "u1", 20), lines)
++        self.assertEqual(post.call_args.kwargs["json"], {"user_id": "u1", "query": "q", "top_k": 20})
++
++    def test_users_are_separate_requests(self):
++        client = MaasvClient()
++        with mock.patch.object(client, "_post", return_value=_Resp({"memories": []})) as post:
++            client.search("q", "u1", 5)
++            client.search("q", "u2", 5)
++        self.assertEqual([c.kwargs["json"]["user_id"] for c in post.call_args_list], ["u1", "u2"])
++
++    def test_delete_user(self):
++        client = MaasvClient()
++        with mock.patch.object(client, "_post", return_value=_Resp({"deleted": 3, "found": 3})) as post:
++            self.assertEqual(client.delete_user("u1"), {"deleted": 3, "found": 3})
++        self.assertEqual(post.call_args.args[0], "/delete_user")
++
++    def test_server_error_raises_after_retries(self):
++        client = MaasvClient()
++        with mock.patch.object(client, "_post", return_value=_Resp({"error": "boom"}, status=500)), \
++                mock.patch("time.sleep"):
++            with self.assertRaises(Exception):
++                client._retry(lambda: client._post("/search", json={}).raise_for_status(), max_retries=1)
++
++    def test_locomo_shared_store_search_queries_speaker_a_once(self):
++        client = mock.Mock()
++        client.search.return_value = ["[2023-05-08 13:56] A: x"]
++        context, _, answer, raw = shared_conv_search(client, "q", "ua", "ub", 20, "A", "B")
++        client.search.assert_called_once_with("q", "ua", 20)
++        self.assertIsNone(answer)
++        self.assertEqual(raw, "[2023-05-08 13:56] A: x")
++        self.assertIn("Memories for user A", context)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/scripts/utils/ingest_helpers.py b/scripts/utils/ingest_helpers.py
+index c734008..49cfd20 100644
+--- a/scripts/utils/ingest_helpers.py
++++ b/scripts/utils/ingest_helpers.py
+@@ -55,7 +55,7 @@ class AddCallTimer:
+ 
+ _CHAT_TIME_LIBS = frozenset({
+     "memos", "everos", "mem0", "cognee", "backboard",
+-    "memorylake", "viking", "memmachine", "mem9", "lcmx",
++    "memorylake", "viking", "memmachine", "mem9", "lcmx", "maasv",
+ })
+ 
+ # ── Libs grouped by session-identification kwarg ─────────────────────────────
+diff --git a/scripts/utils/search_helpers.py b/scripts/utils/search_helpers.py
+index a5cccaa..3a4e062 100644
+--- a/scripts/utils/search_helpers.py
++++ b/scripts/utils/search_helpers.py
+@@ -198,6 +198,7 @@ DEFAULT_SEARCH_DISPATCH = {
+     "memorylake": generic_text_search,
+     "mem9": generic_text_search,
+     "lcmx": generic_text_search,
++    "maasv": generic_text_search,
+ }
+ 
+ 
+-- 
+2.56.0
+

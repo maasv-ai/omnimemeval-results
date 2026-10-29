@@ -1,0 +1,48 @@
+From fa883c2ec88d5df6031f4d8e56c33a88f172ce50 Mon Sep 17 00:00:00 2001
+From: Adam Bell <24683522+ascottbell@users.noreply.github.com>
+Date: Thu, 29 Oct 2026 18:06:05 -0400
+Subject: [PATCH 2/2] Add contributor-run Maasv LoCoMo result (85.26,
+ 2026-10-29)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ docs/user_memory/results.md | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/docs/user_memory/results.md b/docs/user_memory/results.md
+index f4c9a4c..5b10938 100644
+--- a/docs/user_memory/results.md
++++ b/docs/user_memory/results.md
+@@ -67,6 +67,7 @@ the reproduced OmniMemEval scores.
+ | Backboard.io | 22.40 | - | - | - | - | - |
+ | MemOS | 88.83 | 89.20 | 66.87 | 56.75 | 40.58 | 80.91 |
+ | LCM-X | 78.83 | 87.00 | 71.84 | 63.32 | 33.96 | 81.68 |
++| Maasv | 85.26 | - | - | - | - | - |
+ 
+ LCM-X rows are contributor-run: the LCM-X maintainers ran the unchanged pipeline
+ and prompts on **2026-10-18** with OmniMemEval harness commit
+@@ -86,6 +87,13 @@ comes from a separate contributor run on **2026-10-22** with LCM-X v0.28.0; see
+ [LCM-X BEAM 10M run](./lcmx.md#beam-10m-run-2026-10-22) for its harness commits,
+ evidence archive and limitations.
+ 
++The Maasv row is contributor-run: the Maasv team ran the unchanged pipeline and
++prompts on **2026-10-29** with OmniMemEval harness commit `7c79d46` plus the
++`maasv` adapter commit, using a self-hosted Maasv v0.4.46 service (top-k 20) and the dated models from
++the direct OpenAI API. Maasv is not open source; the per-question records
++support artifact arithmetic and answer/judge replay.
++See [Maasv deployment and result provenance](./maasv.md#result-provenance).
++
+ A dash (`-`) means that a reproduced result is not included in this snapshot.
+ For these missing cells, full runs were not completed under the same evaluation
+ setup because of account/API access, service availability, benchmark support,
+@@ -124,6 +132,7 @@ adversarial questions and covers 1,540 questions.
+ | Backboard.io | cloud | 25.09 | 22.34 | 13.40 | 29.17 | 22.40 | 1,198 |
+ | MemOS | cloud | 92.51 | 88.65 | 85.05 | 69.79 | 88.83 | 5,400 |
+ | LCM-X | local/self-hosted | 84.30 | 66.31 | 79.75 | 64.58 | 78.83 | 1,659 |
++| Maasv | local/self-hosted | 89.42 | 80.50 | 83.80 | 67.71 | 85.26 | 1,462 |
+ 
+ ### Published Reference Results
+ 
+-- 
+2.56.0
+
