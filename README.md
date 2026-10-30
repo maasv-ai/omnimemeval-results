@@ -11,9 +11,10 @@ Run records for Maasv's contributor-run results on
 | 2026-10-29, run 2 | BEAM 100K (400 questions) | Nugget score 75.43; 8,419.4 context tokens per question | [`beam100k-20261029-r2/`](./beam100k-20261029-r2/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/beam100k-20261029-r2) |
 | 2026-10-30, run 2 | BEAM 10M (200 questions) | Nugget score 61.69; 8,535.6 context tokens per question | [`beam10m-20261030-r2/`](./beam10m-20261030-r2/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/beam10m-20261030-r2) |
 | 2026-10-30 | HaluMem-Medium (3,467 questions) | 81.05% LLM-as-judge; 2,139.7 context tokens per question | [`halumem-20261030-r1/`](./halumem-20261030-r1/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/halumem-20261030-r1) |
+| 2026-10-30 | PersonaMem v2 (5,000 questions) | 35.48% accuracy (option matching); 2,831.7 context tokens per question | [`pmv2-20261030-r1/`](./pmv2-20261030-r1/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/pmv2-20261030-r1) |
 
-Run 2 and the HaluMem run use one Maasv store per evaluation user, the
-standard self-hosted deployment.
+Run 2 and the HaluMem and PersonaMem v2 runs use one Maasv store per evaluation
+user, the standard self-hosted deployment.
 
 ## Superseded
 
