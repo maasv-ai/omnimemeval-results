@@ -1,0 +1,179 @@
+{
+    "overall": {
+        "nugget_score_mean": 0.6508800720726685,
+        "nugget_score_std": 0.38847859000537566,
+        "total_questions": 200,
+        "duration": {
+            "search_duration_ms": 536.6757309436798,
+            "search_duration_ms_p50": 366.38545989990234,
+            "search_duration_ms_p95": 1518.041265010827,
+            "add_duration_ms": 123376.06470000003,
+            "add_duration_ms_p50": 115819.08499999999,
+            "add_duration_ms_p95": 203619.09949999998
+        }
+    },
+    "per_scale": {
+        "10m": {
+            "nugget_score_mean": 0.6508800720726685,
+            "nugget_score_std": 0.38847859000537566,
+            "count": 200,
+            "duration": {
+                "search_duration_ms": 536.6757309436798,
+                "search_duration_ms_p50": 366.38545989990234,
+                "search_duration_ms_p95": 1518.041265010827
+            }
+        }
+    },
+    "per_dimension": {
+        "abstention": {
+            "nugget_score_mean": 0.8,
+            "nugget_score_std": 0.33166247903554,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 1571.3475584983826,
+                "search_duration_ms_p50": 1143.8599824905396,
+                "search_duration_ms_p95": 3822.4553942680363
+            }
+        },
+        "contradiction_resolution": {
+            "nugget_score_mean": 0.63125,
+            "nugget_score_std": 0.15039011769394958,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 368.84559392929077,
+                "search_duration_ms_p50": 362.3380661010742,
+                "search_duration_ms_p95": 476.36275291442877
+            }
+        },
+        "event_ordering": {
+            "nugget_score_mean": 0.22782849850446327,
+            "nugget_score_std": 0.20095146422948157,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 388.68736028671265,
+                "search_duration_ms_p50": 367.8544759750366,
+                "search_duration_ms_p95": 449.99985694885265
+            }
+        },
+        "information_extraction": {
+            "nugget_score_mean": 0.775,
+            "nugget_score_std": 0.4023369234857771,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 372.4785327911377,
+                "search_duration_ms_p50": 353.75046730041504,
+                "search_duration_ms_p95": 506.155002117157
+            }
+        },
+        "instruction_following": {
+            "nugget_score_mean": 0.875,
+            "nugget_score_std": 0.2680951323690902,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 411.5701675415039,
+                "search_duration_ms_p50": 366.06109142303467,
+                "search_duration_ms_p95": 644.492852687836
+            }
+        },
+        "knowledge_update": {
+            "nugget_score_mean": 0.725,
+            "nugget_score_std": 0.3944933459514875,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 359.3301773071289,
+                "search_duration_ms_p50": 355.07726669311523,
+                "search_duration_ms_p95": 384.1951608657837
+            }
+        },
+        "multi_session_reasoning": {
+            "nugget_score_mean": 0.26083333333333336,
+            "nugget_score_std": 0.3638251640554842,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 406.07433319091797,
+                "search_duration_ms_p50": 369.8195219039917,
+                "search_duration_ms_p95": 562.7156615257267
+            }
+        },
+        "preference_following": {
+            "nugget_score_mean": 0.85,
+            "nugget_score_std": 0.3102418411497714,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 366.6644096374512,
+                "search_duration_ms_p50": 365.6255006790161,
+                "search_duration_ms_p95": 401.6043543815613
+            }
+        },
+        "summarization": {
+            "nugget_score_mean": 0.826388888888889,
+            "nugget_score_std": 0.19881496919323918,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 395.1643705368042,
+                "search_duration_ms_p50": 371.1360692977905,
+                "search_duration_ms_p95": 552.1944642066956
+            }
+        },
+        "temporal_reasoning": {
+            "nugget_score_mean": 0.5375,
+            "nugget_score_std": 0.4128786141228436,
+            "count": 20,
+            "duration": {
+                "search_duration_ms": 726.5948057174683,
+                "search_duration_ms_p50": 904.2068719863892,
+                "search_duration_ms_p95": 1162.3444199562075
+            }
+        }
+    },
+    "per_difficulty": {
+        "clear": {
+            "nugget_score_mean": 0.63125,
+            "nugget_score_std": 0.15039011769394958,
+            "count": 20
+        },
+        "easy": {
+            "nugget_score_mean": 0.5384976525821596,
+            "nugget_score_std": 0.44430487239569205,
+            "count": 71
+        },
+        "hard": {
+            "nugget_score_mean": 0.7917087542087543,
+            "nugget_score_std": 0.318634268814186,
+            "count": 12
+        },
+        "medium": {
+            "nugget_score_mean": 0.7232656706669816,
+            "nugget_score_std": 0.3656622267426678,
+            "count": 91
+        },
+        "moderate": {
+            "nugget_score_mean": 0.6666666666666666,
+            "nugget_score_std": 0.3435921354681384,
+            "count": 6
+        }
+    },
+    "pipeline_status": {
+        "search": {
+            "status_counts": {
+                "success": 200
+            },
+            "failed_units": 0,
+            "skipped_records": 0
+        },
+        "answer": {
+            "status_counts": {
+                "success": 200
+            },
+            "failed_units": 0,
+            "skipped_records": 0
+        },
+        "eval": {
+            "status_counts": {
+                "success": 200
+            },
+            "failed_units": 0,
+            "skipped_records": 0
+        }
+    }
+}

@@ -3,7 +3,24 @@
 Run records for Maasv's contributor-run results on
 [OmniMemEval](https://github.com/MemTensor/OmniMemEval).
 
-## Current
+## Current (Maasv v0.4.48)
+
+| Run | Benchmark | Result | Records |
+| --- | --- | --- | --- |
+| 2026-10-31, run 2 | LoCoMo, categories 1 to 4 (1,540 questions) | 87.73% LLM-as-judge; 1,550.8 context tokens per question | [`locomo-20261031-r2/`](./locomo-20261031-r2/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/locomo-20261031-r2) |
+| 2026-10-31, run 2 | BEAM 100K (400 questions) | Nugget score 76.38; 8,525.6 context tokens per question | [`beam100k-20261031-r2/`](./beam100k-20261031-r2/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/beam100k-20261031-r2) |
+| 2026-11-01, run 2 | BEAM 10M (200 questions) | Nugget score 65.09; 8,656.1 context tokens per question | [`beam10m-20261101-r2/`](./beam10m-20261101-r2/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/beam10m-20261101-r2) |
+| 2026-11-01, run 3 | HaluMem-Medium (3,467 questions) | 82.29% LLM-as-judge; 2,240.5 context tokens per question | [`halumem-20261101-r3/`](./halumem-20261101-r3/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/halumem-20261101-r3) |
+| 2026-11-01, run 2 | PersonaMem v2 (5,000 questions) | 39.86% accuracy (option matching); 2,929.6 context tokens per question | [`pmv2-20261101-r2/`](./pmv2-20261101-r2/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/pmv2-20261101-r2) |
+| 2026-11-01, run 2 | LongMemEval-S (500 questions) | 91.20% LLM-as-judge; 3,999.4 context tokens per question | [`lme-20261101-r2/`](./lme-20261101-r2/) · [release archive](https://github.com/maasv-ai/omnimemeval-results/releases/tag/lme-20261101-r2) |
+
+All six use one Maasv store per evaluation user, the standard self-hosted
+deployment. Run numbers count attempts on this version; each run's README says
+what happened to the earlier ones.
+
+## Maasv v0.4.46 (replaced by v0.4.48)
+
+These records stay here unchanged.
 
 | Run | Benchmark | Result | Records |
 | --- | --- | --- | --- |
